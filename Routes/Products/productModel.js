@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  productName: {
+  wineName: {
     type: String,
     required: true,
     minlength: 2,
     maxlength: 256,
   },
-  description: {
+  wineType: { type: String, required: true, required: true },
+  wineDescription: {
     type: String,
     required: true,
     minlength: 10,
@@ -19,25 +20,25 @@ const productSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 100,
   },
-  year: {
+  wineYear: {
     type: Number,
     required: true,
     min: 1900,
     max: 2023,
   },
-  price: {
+  winePrice: {
     type: Number,
     required: true,
     min: 1,
     max: 100000,
   },
-  stock: {
+  wineStock: {
     type: Number,
     required: true,
     min: 0,
     max: 100000,
   },
-  image: {
+  wineImage: {
     type: String,
     required: true,
     minlength: 11,
@@ -47,7 +48,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  sku: {
+  wineSKU: {
     type: String,
     required: true,
     minlength: 10,

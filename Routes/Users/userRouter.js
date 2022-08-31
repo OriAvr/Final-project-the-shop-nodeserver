@@ -11,6 +11,11 @@ const User = require("./userModel");
 const auth = require("../../middlewares/authorization");
 
 router.post("/register", async (req, res) => {
+  const passwordRegExp =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/gm;
+
+  console.log(validateRegistration(req.body));
+
   const { error } = validateRegistration(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -21,7 +26,7 @@ router.post("/register", async (req, res) => {
 
   if (adminPassword === "1111") {
     user = new User(
-      _.pick(req.body, ["name", "email", "password", "biz", "favorites"])
+      _.pick(req.body, ["name", "email", "password", "isAdmin", "favorites"])
     );
 
     user.password = generateHashPassword(user.password);
@@ -39,18 +44,19 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
+  console.log(req.body);
   const { error } = validateSignin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Invalid email or password.");
+  if (!user) return res.status(400).send("Invalid email");
 
   const validPassword = comparePassword(req.body.password, user.password);
-  if (!validPassword) return res.status(400).send("Invalid email or password.");
+  if (!validPassword) return res.status(400).send("Invalid password.");
 
   res.json({
     token: generateAuthToken(user),
-    isAdmin: user.biz,
+    isAdmin: user.isAdmin,
   });
 });
 
@@ -83,6 +89,7 @@ router.put("/favorite/:sku", async (req, res) => {
     .catch((err) => res.send(err));
 });
 
+//Get user favorites
 router.get("/favorites/:email", async (req, res) => {
   const user = await User.findOne({ email: req.params.email });
   if (!user) return res.status(400).send("User Not Found");
@@ -93,16 +100,6 @@ router.get("/findfavorite/:email", async (req, res) => {
   const user = await User.findOne({ email: req.params.email });
   if (!user) return res.status(400).send("User Not Found");
   res.send();
-});
-
-router.get("/userInfo", auth, (req, res) => {
-  let user = req.user;
-  // if (user.biz) return res.status(403).json("Un authorize user!"); // מראה בדיקה אם המשתמש הוא עסקי
-
-  User.findById(user._id)
-    .select(["-password", "-createdAt", "-__v"])
-    .then((user) => res.json(user))
-    .catch((errorsFromMongoose) => res.status(500).json(errorsFromMongoose));
 });
 
 module.exports = router;

@@ -28,11 +28,6 @@ const userSchema = new mongoose.Schema({
       maxlength: 100,
     },
   ],
-  biz: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
   createdAt: { type: Date, default: Date.now },
   isAdmin: { type: Boolean, default: false },
 });
