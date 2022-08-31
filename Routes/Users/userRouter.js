@@ -9,12 +9,15 @@ const _ = require("lodash");
 const router = require("express").Router();
 const User = require("./userModel");
 const auth = require("../../middlewares/authorization");
+const { isFunction } = require("lodash");
 
 router.post("/register", async (req, res) => {
   const passwordRegExp =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/gm;
 
-  console.log(validateRegistration(req.body));
+  if (!passwordRegExp.test(req.body.password)) {
+    return res.status(400).send("Password does not meet the requirements");
+  }
 
   const { error } = validateRegistration(req.body);
   if (error) return res.status(400).send(error.details[0].message);
